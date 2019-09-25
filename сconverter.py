@@ -43,7 +43,7 @@ def main():
     args = parse_args()
     (file_name, extension) = parse_filename(args.file)
     if extension != "cs":
-        print('File is not correct', file=sys.stderr)
+        print('File is not correct\nExpected *.cs', file=sys.stderr)
         sys.exit(ERROR_WRONG_EXTENSION)
     f = open(args.file, 'r')
     try:
