@@ -16,7 +16,7 @@ if sys.platform.startswith('linux'):
     import readline
 
 try:
-    from convert import xmldoc2xml
+    import convert.xmldoc2xml
 except Exception as e:
     print('Convert modules not found: "{}"'.format(e), file=sys.stderr)
     sys.exit(ERROR_MODULES_MISSING)
@@ -34,7 +34,7 @@ def parse_args():
 
 def parse_filename(file):
     separator = file.rfind('.')
-    if separator == -1:
+    if separator == -1 or separator == 0:
         return (file, "")
     return (file[:separator], file[separator + 1:])
 
