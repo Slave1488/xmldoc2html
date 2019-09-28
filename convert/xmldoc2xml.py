@@ -1,4 +1,4 @@
-from ..markup.markup import *
+from markup.markup import *
 
 
 def convert(content, **kwargs):
@@ -15,4 +15,4 @@ def convert(content, **kwargs):
         assembly_name.add_content(kwargs["file_name"])
     members = tag("members")
     tag_doc.add_tag(members)
-    return str(doc)
+    return doc

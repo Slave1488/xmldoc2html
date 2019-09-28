@@ -16,7 +16,7 @@ if sys.platform.startswith('linux'):
     import readline
 
 try:
-    import convert.xmldoc2xml
+    from convert import xmldoc2xml
 except Exception as e:
     print('Convert modules not found: "{}"'.format(e), file=sys.stderr)
     sys.exit(ERROR_MODULES_MISSING)

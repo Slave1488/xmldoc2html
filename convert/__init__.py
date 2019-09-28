@@ -1,3 +1,3 @@
 __all__ = [
-    xmldoc2xml
+    "xmldoc2xml"
 ]
