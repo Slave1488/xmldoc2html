@@ -87,15 +87,23 @@ def run():
             res = []
             for d in data:
                 t = Tag("member")
+                tw = [t]
                 for c in d[1]:
-                    t.add_text(c)
-                val = "{}:".format(d[0][0])
+                    if re.match(r'</.*>$', c):
+                        tw.pop()
+                    elif re.match(r'<.*>$', c):
+                        nt = Tag(re.search(r'<(.*)>', c).group(1))
+                        tw[-1].add_tag(nt)
+                        tw.append(nt)
+                    else:
+                        tw[-1].add_text(c)
+                val = f"{d[0][0]}:"
                 if self._namespace:
                     val += self._namespace + '.'
                     if self._class:
                         val += self._class + '.'
                         temp = re.compile(
-                            r'^{}(?=[\s(]|$)'.format(self._class))
+                            f'^{self._class}(?=[\\s(]|$)')
                         if re.match(temp, d[0][1]):
                             val += re.sub(temp, '#ctor', d[0][1])
                         else:
