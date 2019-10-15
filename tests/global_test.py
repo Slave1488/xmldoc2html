@@ -8,10 +8,7 @@ class ComprehensiveTest(unittest.TestCase):
         copyfile('tests/test_content.txt', 'content.txt')
 
     def test(self):
-        try:
-            run()
-        except Exception as e:
-            self.fail()
+        run()
 
 
 if __name__ == '__main__':
