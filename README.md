@@ -5,7 +5,7 @@ xmldoc2html
 
 Автор: Рыльцов Дмитрий
 
-github: https://github.com/Slave1488/xmldoc2html (пока не действителен)
+github: https://github.com/Slave1488/xmldoc2html
 
 --------
 
