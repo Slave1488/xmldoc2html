@@ -89,10 +89,16 @@ def run():
                 t = Tag("member")
                 tw = [t]
                 for c in d[1]:
-                    if re.match(r'</.*>$', c):
+                    if re.fullmatch(r'</.*>', c):
                         tw.pop()
-                    elif re.match(r'<.*>$', c):
-                        nt = Tag(re.search(r'<(.*)>', c).group(1))
+                    elif re.fullmatch(r'<.*>', c):
+                        dt = re.findall(r'(?:^\S*)|(?:\S*=\".*?\")',
+                                        re.search(r'<(.*)>', c).group(1))
+                        nt = Tag(dt[0])
+                        for a in dt[1:]:
+                            d = re.fullmatch(r'(\S*)=\"(.*?)\"', a)
+                            n, v = d[1], d[2]
+                            nt.add_attribute(Attribute(n, v))
                         tw[-1].add_tag(nt)
                         tw.append(nt)
                     else:
