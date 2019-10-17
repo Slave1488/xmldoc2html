@@ -52,12 +52,20 @@ def run():
             self._name = name
             self._attributes = []
             self._content = []
+            self._tags = {}
+
+        def __getitem__(self, key):
+            return self._tags[key]
 
         def add_content(self, content):
             self._content.append(content)
 
         def add_tag(self, tag):
             self.add_content(tag)
+            if tag._name in self._tags:
+                self._tags[tag._name].append(tag)
+            else:
+                self._tags[tag._name] = [tag]
 
         def add_text(self, text):
             self.add_content(TextContent(text))
@@ -131,7 +139,8 @@ def run():
     mg = MemberGen()
 
     members = Tag("members")
-    members._content = mg.create_members(need_data)
+    for m in mg.create_members(need_data):
+        members.add_tag(m)
 
     assembly = Tag("assembly")
     temp = Tag("name")
@@ -142,4 +151,26 @@ def run():
     doc.add_tag(assembly)
     doc.add_tag(members)
 
-    print(doc.to_string())
+    class Translater:
+        def __init__(self):
+            pass
+
+        def translate(self, xmldoc):
+            table = Tag("table")
+            caption = Tag("caption")
+            table.add_tag(caption)
+            for c in xmldoc["assembly"][0]["name"][0]._content:
+                caption.add_content(c)
+            for m in xmldoc["members"][0]["member"]:
+                tr = Tag('tr')
+                th = Tag('th')
+                th.add_text(m._attributes[0]._value)
+                tr.add_tag(th)
+                table.add_tag(tr)
+            return table
+
+    xth = Translater()
+
+    html = xth.translate(doc)
+
+    print(html.to_string())
