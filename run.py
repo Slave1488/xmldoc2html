@@ -10,10 +10,8 @@ def run():
             r'(?:[^\s()]+(?:\(.*?\S.*?\))?$)|(?:[^\s()]+(?=\(\s*\)$))', line)
         name = name.group() if name else '???'
         sym = '?'
-        if re.search(r'(?:class)|(?:delegate)', line):
+        if re.search(r'class', line):
             sym = 'T'
-        elif re.search(r'event', line):
-            sym = 'E'
         elif re.search(r'\(.*\)', line):
             sym = 'M'
         else:
@@ -96,8 +94,8 @@ def run():
                                         re.search(r'<(.*)>', c).group(1))
                         nt = Tag(dt[0])
                         for a in dt[1:]:
-                            d = re.fullmatch(r'(\S*)=\"(.*?)\"', a)
-                            n, v = d[1], d[2]
+                            da = re.fullmatch(r'(\S*)=\"(.*?)\"', a)
+                            n, v = da[1], da[2]
                             nt.add_attribute(Attribute(n, v))
                         tw[-1].add_tag(nt)
                         tw.append(nt)
@@ -135,4 +133,13 @@ def run():
     members = Tag("members")
     members._content = mg.create_members(need_data)
 
-    print(members.to_string())
+    assembly = Tag("assembly")
+    temp = Tag("name")
+    temp.add_text("content")
+    assembly.add_tag(temp)
+
+    doc = Tag("doc")
+    doc.add_tag(assembly)
+    doc.add_tag(members)
+
+    print(doc.to_string())
