@@ -2,6 +2,7 @@
 
 content.txt
 xml.txt
+html.html
 
 **/__pycache__/
 **/*.pyc
