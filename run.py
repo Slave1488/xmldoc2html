@@ -42,30 +42,28 @@ def run():
 
     class TextContent:
         def __init__(self, text):
-            self._text = text
+            self._value = text
 
         def to_string(self):
-            return self._text
+            return self._value
 
     class Tag:
         def __init__(self, name):
             self._name = name
             self._attributes = []
             self._content = []
-            self._tags = {}
 
         def __getitem__(self, key):
-            return self._tags[key]
+            return list(filter(lambda c: isinstance(c, Tag) and c._name == key,
+                               self._content)) + \
+                   list(filter(lambda a: a._name == key,
+                               self._attributes))
 
         def add_content(self, content):
             self._content.append(content)
 
         def add_tag(self, tag):
             self.add_content(tag)
-            if tag._name in self._tags:
-                self._tags[tag._name].append(tag)
-            else:
-                self._tags[tag._name] = [tag]
 
         def add_text(self, text):
             self.add_content(TextContent(text))
@@ -161,11 +159,42 @@ def run():
             table.add_tag(caption)
             for c in xmldoc["assembly"][0]["name"][0]._content:
                 caption.add_content(c)
-            for m in xmldoc["members"][0]["member"]:
-                tr = Tag('tr')
-                th = Tag('th')
-                th.add_text(m._attributes[0]._value)
-                tr.add_tag(th)
+            members = xmldoc["members"][0]
+
+            def get_all_inner(tag):
+                return [(tag._name,)] + \
+                    [(tag._name, attr._name)
+                     for attr in tag._attributes] + \
+                    [(tag._name,) + inner
+                     for inner_tag in filter(lambda c: isinstance(c, Tag),
+                                             tag._content)
+                     for inner in get_all_inner(inner_tag)]
+            cs = list(filter(
+                bool, map(
+                    lambda n: n[2:],
+                    sorted(filter(
+                        lambda n: len(n) > 2 and n[0] == "members" and n[1] == "member",
+                        set(get_all_inner(members)))))))
+            thead = Tag("thead")
+            for c in cs:
+                td = Tag("td")
+                td.add_text('.'.join(c))
+                thead.add_tag(td)
+            table.add_tag(thead)
+            for m in members["member"]:
+                tr = Tag("tr")
+                for c in cs:
+                    td = Tag("td")
+                    cont = [m]
+                    for kc in c:
+                        cont = [nc for t in cont for nc in t[kc]]
+                    for nc in cont:
+                        if isinstance(nc, Attribute):
+                            td.add_text(nc._value)
+                        else:
+                            for tc in filter(lambda x: isinstance(x, TextContent), nc._content):
+                                td.add_content(tc)
+                    tr.add_tag(td)
                 table.add_tag(tr)
             return table
 
@@ -173,4 +202,5 @@ def run():
 
     html = xth.translate(doc)
 
-    print(html.to_string())
+    with open("html.html", 'w') as f:
+        f.write(html.to_string())
