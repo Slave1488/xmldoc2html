@@ -2,6 +2,7 @@ import sys
 from functools import reduce
 import operator
 import re
+from parserLines import SimpleParser
 
 
 def run():
