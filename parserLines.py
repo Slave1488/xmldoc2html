@@ -4,10 +4,10 @@ from collections import namedtuple
 class SimpleGenerator:
     def __init__(self, *,
                  init_args=None,
-                 move=None,
-                 verify=None):
-        self._move = move or (lambda x: (x, x))
-        self._verify = verify or (lambda x: x)
+                 move=lambda x: (x, x),
+                 verify=lambda x: x):
+        self._move = move
+        self._verify = verify
         self._curent, self._args = self._move(init_args)
 
     def __iter__(self):
