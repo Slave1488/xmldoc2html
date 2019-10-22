@@ -2,7 +2,6 @@ import sys
 from functools import reduce
 import operator
 import re
-from parserLines import SimpleParser
 
 
 def run():
@@ -19,9 +18,8 @@ def run():
             sym = 'F'
         return sym, name
 
-    f = open("content.txt", 'r')
-
-    content = f.read()
+    with open("content.txt", 'r') as f:
+        content = f.read()
 
     namespace = ('N', re.search(r'namespace ([^{\s]*)', content).group(1)), []
 
