@@ -37,7 +37,6 @@ def get_reader(text_input, extra_verify=lambda line: True):
     def verify(line):
         return line and extra_verify(line)
     return SimpleGenerator(
-        init_args='',
         move=read,
         verify=verify
     )
