@@ -1,7 +1,14 @@
+import sys
 from collections import namedtuple
 from functools import reduce
 from itertools import chain
 import re
+MISSING_MODULE = 1
+try:
+    from layout import Tag, Attribute
+except Exception as e:
+    print(f'We have some problems: {e}', file=sys.stderr)
+    exit(MISSING_MODULE)
 
 
 class SimpleGenerator:
@@ -53,9 +60,13 @@ DocObject = namedtuple('docObject', [
     'name',
     'type_name'
 ])
+NAMESPACE = 'N'
+TYPE = 'T'
+METHOD = 'M'
+FIELD = 'F'
 caption_trash = re.compile(r'\s*[:=;{].*', re.DOTALL)
 method_signature = re.compile(r'\(.*\)$')
-not_empty_signature = re.compile(r'\(.*\S.*\)')
+empty_signature = re.compile(r'\(\s*\)')
 
 
 def parse_caption(caption):
@@ -66,16 +77,14 @@ def parse_caption(caption):
         return
     name = caption[-1]
     if caption[-2] == 'namespace':
-        type_name = 'N'
+        type_name = NAMESPACE
     elif caption[-2] == 'class':
-        type_name = 'T'
+        type_name = TYPE
     elif signature:
-        type_name = 'M'
-        signature = signature.group()
-        if not_empty_signature.fullmatch(signature):
-            name += signature
+        type_name = METHOD
+        name = name, signature.group()
     else:
-        type_name = 'F'
+        type_name = FIELD
     return DocObject(name, type_name)
 
 
@@ -94,16 +103,19 @@ doc_trash = re.compile(r'///(?!/)')
 doc_token = re.compile(r'(</.*?>)|(<.*?>)|([^<\s][^<]*[^<\s]|[^<\s])')
 
 
+def get_token(simple_token):
+    if simple_token[0]:
+        return DocToken(CLOSE_TAG, simple_token[0])
+    elif simple_token[1]:
+        return DocToken(OPEN_TAG, simple_token[1])
+    elif simple_token[2]:
+        return DocToken(CONTENT, simple_token[2])
+    else:
+        raise ValueError()
+
+
 def parse_doc_line(doc_line):
     doc_line = doc_trash.sub('', doc_line)
-
-    def get_token(simple_token):
-        if simple_token[0]:
-            return DocToken(CLOSE_TAG, simple_token[0])
-        elif simple_token[1]:
-            return DocToken(OPEN_TAG, simple_token[1])
-        elif simple_token[2]:
-            return DocToken(CONTENT, simple_token[2])
     return map(get_token, doc_token.findall(doc_line))
 
 
@@ -113,6 +125,34 @@ DocData = namedtuple('docData', [
 ])
 
 
+def compile_name(type_name, *hierarchy):
+    name = '.'.join(hierarchy)
+    return f'{type_name}:{name}'
+
+
+def generate_member(doc_data, args):
+    member = Tag('member')
+    if doc_data.doc_object.type_name == NAMESPACE:
+        args = [doc_data.doc_object.name]
+    elif doc_data.doc_object.type_name == TYPE:
+        args = args[:1] + [doc_data.doc_object.name]
+    elif doc_data.doc_object.type_name == METHOD:
+        self_name = doc_data.doc_object.name[0] if \
+            not doc_data.doc_object.name[0] == args[1] else '#ctor'
+        if not empty_signature.fullmatch(doc_data.doc_object.name[1]):
+            self_name += doc_data.doc_object.name[1]
+        args = args[:2] + [self_name]
+    elif doc_data.doc_object.type_name == FIELD:
+        args = args[:2] + [doc_data.doc_object.name]
+    else:
+        raise ValueError()
+    member.add_attribute(Attribute(
+        'name', compile_name(doc_data.doc_object.type_name, *args)))
+    for token in doc_data.documentation:
+        member.add_content(token.val)
+    return member, args
+
+
 def get_simple_parser(text_input):
     reader = get_reader(text_input, is_simple_line)
 
@@ -120,12 +160,13 @@ def get_simple_parser(text_input):
         for line in reader:
             catch = catch_undocumented_object(line)
             if catch:
-                return DocData(catch, []), args
+                _, args = generate_member(DocData(catch, []), args)
         reader.change_validator(is_documentation_line)
         doc = list(reduce(chain, map(parse_doc_line, reader), []))
         reader.change_validator(is_simple_line)
         doc_object = parse_caption(reader.next())
-        return DocData(doc_object, doc), args
+        return generate_member(DocData(doc_object, doc), args)
     return SimpleGenerator(
-        move=get_doc
+        move=get_doc,
+        init_args={}
     )
