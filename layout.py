@@ -34,8 +34,24 @@ class Tag:
     def add_attribute(self, attribute):
         self._attributs.append(attribute)
 
+    def get_attributes(self, name=None):
+        if name:
+            return filter(lambda attr: attr._name == name, self._attributs)
+        return self._attributs
+
     def add_content(self, content):
         self._content.append(content)
+
+    def get_content(self):
+        return filter(lambda cont: not isinstance(cont, Tag), self._content)
+
+    def get_tags(self, name=None):
+        if name:
+            return filter(lambda tag: tag._name == name, self.get_tags())
+        return filter(lambda cont: isinstance(cont, Tag), self._content)
+
+    def get_tag(self, name):
+        return list(self.get_tags(name))[0]
 
     def view(self):
         attrs_view = reduce(
