@@ -235,38 +235,35 @@ def simple_parse(text_input):
     return compile_xmldoc(text_input.name, generator_member)
 
 
-def content_finder(tag):
-    attrsi = iter(tag.get_attributes())
-    attrs = SimpleGenerator(
-        generator=lambda: (attrsi.__next__(),))
-    tagsi = iter(tag.get_tags())
-    tags = SimpleGenerator(
-        generator=lambda: (tagsi.__next__(),))
-    used = []
-    nested_contenti = iter([])
-    nested_content = SimpleGenerator(
-        generator=lambda: (nested_contenti.__next__(),))
+def present(tag):
+    ptag = Tag(tag._name)
+    pattrs = set(map(lambda attr: attr._name, tag.get_attributes()))
+    for pattr in pattrs:
+        ptag.add_attribute(pattr)
+    tag_names = set(map(lambda tag: tag._name, tag.get_tags()))
+    for name in tag_names:
+        ptag.add_content(
+            reduce(merge_present, map(present, tag.get_tags(name))))
+    return ptag
 
-    def find():
-        nonlocal nested_content
-        for attr in attrs:
-            if attr._name not in used:
-                used.append(attr._name)
-                return ('attr', attr._name),
-        for cont in nested_content:
-            return cont,
-        for tag in tags:
-            nested_contenti = content_finder(tag)
-            return ('tag', tag._name),
-        return None,
-    return SimpleGenerator(
-        generator=find
-    )
+
+def merge_present(ptag_x, ptag_y):
+    if not ptag_x or not ptag_y:
+        return ptag_x or ptag_y
+    if ptag_x._name != ptag_y._name:
+        raise ValueError()
+    ptag_m = Tag(ptag_x._name)
+    for attr in set(ptag_x.get_attributes() + ptag_y.get_attributes()):
+        ptag_m.add_attribute(attr)
+    ptag_names = set(map(
+        lambda ptag: ptag._name,
+        list(ptag_x.get_tags()) + list(ptag_y.get_tags())))
+    for name in ptag_names:
+        ptag_m.add_content(
+            merge_present(ptag_x.get_tag(name), ptag_y.get_tag(name)))
+    return ptag_m
 
 
 def hardcore_pareser(xmldoc):
-    members = xmldoc.get_tag('members')
-    for member in members.get_tags('member'):
-        for content in content_finder(member):
-            print(content)
-        print('----------')
+    from layout import view
+    print(view(present(xmldoc)))
