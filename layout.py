@@ -6,7 +6,7 @@ import re
 def view(content):
     if hasattr(content, 'view'):
         return content.view()
-    return f'{content}\n'
+    return content
 
 
 not_empty_line = re.compile(r'([^\n]+\n)')
@@ -28,16 +28,16 @@ class Attribute:
 class Tag:
     def __init__(self, name):
         self._name = name
-        self._attributs = []
+        self._attributes = []
         self._content = []
 
     def add_attribute(self, attribute):
-        self._attributs.append(attribute)
+        self._attributes.append(attribute)
 
     def get_attributes(self, name=None):
         if name:
-            return filter(lambda attr: attr._name == name, self._attributs)
-        return self._attributs
+            return filter(lambda attr: attr._name == name, self._attributes)
+        return self._attributes
 
     def add_content(self, content):
         self._content.append(content)
@@ -51,11 +51,12 @@ class Tag:
         return filter(lambda cont: isinstance(cont, Tag), self._content)
 
     def get_tag(self, name):
-        return list(self.get_tags(name))[0]
+        tags = list(self.get_tags(name))
+        return tags[0] if tags else None
 
     def view(self):
         attrs_view = reduce(
-            add, map(lambda attr: f' {view(attr)}', self._attributs), '')
+            add, map(lambda attr: f' {view(attr)}', self._attributes), '')
         content_view = reduce(
             add, map(lambda cont: f'{view(cont)}', self._content), '') or \
             '\n'
