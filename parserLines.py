@@ -266,4 +266,4 @@ def merge_present(ptag_x, ptag_y):
 
 def hardcore_pareser(xmldoc):
     from layout import view
-    print(view(present(xmldoc)))
+    print(view(present(xmldoc.get_tag('members')).get_tag('member')))
