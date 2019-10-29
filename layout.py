@@ -9,7 +9,7 @@ def view(content):
     return content
 
 
-not_empty_line = re.compile(r'([^\n]+\n)')
+not_empty_line = re.compile(r'(.+)')
 
 
 def move_text(text):
