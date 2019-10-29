@@ -39,8 +39,8 @@ class Tag:
             return filter(lambda attr: attr._name == name, self._attributes)
         return self._attributes
 
-    def add_content(self, content):
-        self._content.append(content)
+    def add_content(self, *content):
+        self._content.extend(content)
 
     def get_content(self):
         return filter(lambda cont: not isinstance(cont, Tag), self._content)
@@ -58,9 +58,9 @@ class Tag:
         attrs_view = reduce(
             add, map(lambda attr: f' {view(attr)}', self._attributes), '')
         content_view = reduce(
-            add, map(lambda cont: f'{view(cont)}', self._content), '') or \
+            add, map(lambda cont: f'{view(cont)}\n', self._content), '') or \
             '\n'
-        return '<{name}{attr}>\n{cont}</{name}>\n'.format(
+        return '<{name}{attr}>\n{cont}</{name}>'.format(
             name=self._name,
             attr=attrs_view,
             cont=move_text(content_view)
