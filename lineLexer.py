@@ -1,27 +1,38 @@
 import re
 from collections import namedtuple
-import parseHeader
+from enum import Enum
+import headerParser as hparser
+import xmlParser as xparser
 
-TRASH, HEADER, DOC = range(3)
-doc_line = re.compile(r'\s*///(?:[^/]|$)')
+
 LineToken = namedtuple('lineToken', [
-    'sym',
+    'sum',
     'val'
 ])
 
 
-def create_line_token(line):
-    val = line
+class LineSummary(Enum):
+    TRASH, HEADER, DOC = range(3)
+
+
+doc_line = re.compile(r'\s*///(?:[^/]|$)')
+doc_trash = re.compile(r'///(?!/)')
+
+
+def create_token(line):
     if doc_line.match(line):
-        sym = DOC
-    elif (parsed_header := parseHeader.parse_header(line)) is not None:
-        val = parsed_header
-        sym = HEADER
+        sum = LineSummary.DOC
+        line = doc_trash.sub('', line)
+        val = xparser.parse(line)
+    elif (member_id := hparser.parse(line)) is not None:
+        sum = LineSummary.HEADER
+        val = member_id
     else:
-        sym = TRASH
-    return LineToken(sym, val)
+        sum = LineSummary.TRASH
+        val = line
+    return LineToken(sum, val)
 
 
-def get_line_tokens(lines):
+def get_tokens(lines):
     for line in lines:
-        yield create_line_token(line)
+        yield create_token(line)
