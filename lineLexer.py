@@ -14,8 +14,8 @@ def create_line_token(line):
     val = line
     if doc_line.match(line):
         sym = DOC
-    elif res := parseHeader.parse_header(line):
-        print(res)
+    elif (parsed_header := parseHeader.parse_header(line)) is not None:
+        val = parsed_header
         sym = HEADER
     else:
         sym = TRASH
