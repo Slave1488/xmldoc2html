@@ -1,8 +1,8 @@
 import re
 from collections import namedtuple
+import parseHeader
 
-
-TRASH, DOC = range(2)
+TRASH, HEADER, DOC = range(3)
 doc_line = re.compile(r'\s*///(?:[^/]|$)')
 LineToken = namedtuple('lineToken', [
     'sym',
@@ -11,11 +11,14 @@ LineToken = namedtuple('lineToken', [
 
 
 def create_line_token(line):
+    val = line
     if doc_line.match(line):
         sym = DOC
+    elif res := parseHeader.parse_header(line):
+        print(res)
+        sym = HEADER
     else:
         sym = TRASH
-    val = line
     return LineToken(sym, val)
 
 
