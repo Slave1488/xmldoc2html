@@ -1,6 +1,8 @@
-from run import run
-import parserLines
-from layout import Tag, Attribute, view
+import reader
+import lineLexer
 
-with open('content.txt', 'r') as f:
-    parserLines.hardcore_pareser(parserLines.simple_parse(f))
+with open('content.txt') as f:
+    lr = reader.get_line_reader(f)
+    lts = lineLexer.get_line_tokens(lr)
+    for token in lts:
+        print(token)

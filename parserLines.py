@@ -6,7 +6,7 @@ import re
 ERROR_MISSING_MODULE = 1
 try:
     from layout import Tag, Attribute
-    from simpleGenerator import SimpleGenerator
+    from simpleGenerator import SimpleGenerator, get_generator
 except Exception as e:
     print(f'We have some problems: {e}', file=sys.stderr)
     exit(ERROR_MISSING_MODULE)
@@ -132,7 +132,7 @@ tag_name = re.compile(r'\S+')
 attribute = re.compile(r'(\S+)="(.*)"')
 
 
-def compile_tag(open_tag):
+def compile_tag(open_tag, content):
     name = tag_name.match(open_tag)
     if name:
         name = name.group()
@@ -141,17 +141,17 @@ def compile_tag(open_tag):
     tag = Tag(name)
     for attr in attribute.findall(open_tag):
         tag.add_attribute(Attribute(*attr))
+    fill_tag(tag, content)
     return tag
 
 
-def get_generator_content(tokens_iter, tag_name=None):
+def get_generator_tag(tokens, tag_name=None):
     def generate():
-        token = tokens_iter.__next__()
+        token = tokens.__next__()
         if token.sym == CONTENT:
             return token.val,
         elif token.sym == OPEN_TAG:
-            tag = compile_tag(token.val)
-            fill_tag(tag, tokens_iter)
+            tag = compile_tag(token.val, tokens)
             return tag,
         elif token.sym == CLOSE_TAG:
             return None,
@@ -162,8 +162,8 @@ def get_generator_content(tokens_iter, tag_name=None):
     )
 
 
-def fill_tag(tag, tokens_iter):
-    for content in get_generator_content(tokens_iter):
+def fill_tag(tag, tokens):
+    for content in get_generator_tag(tokens):
         tag.add_content(content)
 
 
@@ -235,35 +235,50 @@ def simple_parse(text_input):
     return compile_xmldoc(text_input.name, generator_member)
 
 
-def present(tag):
-    ptag = Tag(tag._name)
-    pattrs = set(map(lambda attr: attr._name, tag.get_attributes()))
-    for pattr in pattrs:
-        ptag.add_attribute(pattr)
+def make_map(tag, name_key=None):
+    if name_key:
+        return reduce(
+            merge_map, map(make_map, tag.get_tags(name_key)), Tag(name_key))
+    mtag = Tag(tag._name)
+    attrs = set(map(lambda attr: attr._name, tag.get_attributes()))
+    for attr in attrs:
+        mtag.add_attribute(attr)
     tag_names = set(map(lambda tag: tag._name, tag.get_tags()))
     for name in tag_names:
-        ptag.add_content(
-            reduce(merge_present, map(present, tag.get_tags(name))))
-    return ptag
+        mtag.add_content(make_map(tag, name))
+    return mtag
 
 
-def merge_present(ptag_x, ptag_y):
-    if not ptag_x or not ptag_y:
-        return ptag_x or ptag_y
-    if ptag_x._name != ptag_y._name:
+def merge_map(mtag_x, mtag_y):
+    if not mtag_x or not mtag_y:
+        return mtag_x or mtag_y
+    if mtag_x._name != mtag_y._name:
         raise ValueError()
-    ptag_m = Tag(ptag_x._name)
-    for attr in set(ptag_x.get_attributes() + ptag_y.get_attributes()):
-        ptag_m.add_attribute(attr)
-    ptag_names = set(map(
+    mtag_m = Tag(mtag_x._name)
+    for attr in set(mtag_x.get_attributes() + mtag_y.get_attributes()):
+        mtag_m.add_attribute(attr)
+    mtag_names = set(map(
         lambda ptag: ptag._name,
-        list(ptag_x.get_tags()) + list(ptag_y.get_tags())))
-    for name in ptag_names:
-        ptag_m.add_content(
-            merge_present(ptag_x.get_tag(name), ptag_y.get_tag(name)))
-    return ptag_m
+        list(mtag_x.get_tags()) + list(mtag_y.get_tags())))
+    for name in mtag_names:
+        mtag_m.add_content(
+            merge_map(mtag_x.get_tag(name), mtag_y.get_tag(name)))
+    return mtag_m
+
+
+class Cell:
+    def __init__(self, *things):
+        self._contents = things
+
+    def add(self, *things):
+        self._contents.extend(things)
+
+    def merge(self, cell):
+        self.add(*cell.get_content())
+
+    def get_content(self):
+        return self._contents
 
 
 def hardcore_pareser(xmldoc):
-    from layout import view
-    print(view(present(xmldoc.get_tag('members')).get_tag('member')))
+    member_map = make_map(xmldoc.get_tag('members'), 'member')
