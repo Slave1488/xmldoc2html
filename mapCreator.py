@@ -4,9 +4,6 @@ from tagMap import Map
 
 
 def create(tag, *tags):
-    for other_tag in tags:
-        if other_tag._name != tag._name:
-            raise ValueError()
     tags = (tag,) + tags
     rmap = Map()
     attr_names = reduce(
