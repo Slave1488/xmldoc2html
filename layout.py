@@ -28,16 +28,16 @@ class Attribute:
 class Tag:
     def __init__(self, name):
         self._name = name
-        self._attributes = []
+        self._attrs = []
         self._content = []
 
-    def add_attribute(self, attribute):
-        self._attributes.append(attribute)
+    def add_attr(self, attr):
+        self._attrs.append(attr)
 
-    def get_attributes(self, name=None):
+    def get_attrs(self, name=None):
         if name:
-            return filter(lambda attr: attr._name == name, self._attributes)
-        return self._attributes
+            return filter(lambda attr: attr._name == name, self._attrs)
+        return self._attrs
 
     def add_content(self, *content):
         self._content.extend(content)
@@ -56,7 +56,7 @@ class Tag:
 
     def view(self):
         attrs_view = reduce(
-            add, map(lambda attr: f' {view(attr)}', self._attributes), '')
+            add, map(lambda attr: f' {view(attr)}', self._attrs), '')
         content_view = reduce(
             add, map(lambda cont: f'{view(cont)}\n', self._content), '') or \
             '\n'
