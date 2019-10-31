@@ -8,7 +8,7 @@ attribute = re.compile(r'(\S+)="(.*)"')
 def compile(name, tokens_gen, *attrs):
     tag = Tag(name)
     for attr in attrs:
-        tag.add_attr(attr)
+        tag.add_attrs(attr)
     for token in tokens_gen:
         if token.sum == XmlSummary.CONTENT:
             tag.add_content(token.val)
