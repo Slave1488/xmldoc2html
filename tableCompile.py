@@ -4,9 +4,9 @@ from layout import Tag
 def compile_th_tr(name_list):
     tr = Tag('tr')
     for cont in name_list:
-        td = Tag('td')
-        td.add_content(*cont)
-        tr.add_content(td)
+        th = Tag('th')
+        th.add_content(*cont)
+        tr.add_content(th)
     return tr
 
 

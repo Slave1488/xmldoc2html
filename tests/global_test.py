@@ -1,6 +1,6 @@
 import unittest
 from shutil import copyfile
-from run import run
+from __main__ import main
 
 
 class ComprehensiveTest(unittest.TestCase):
@@ -8,7 +8,7 @@ class ComprehensiveTest(unittest.TestCase):
         copyfile('tests/test_content.txt', 'content.txt')
 
     def test(self):
-        run()
+        main()
 
 
 if __name__ == '__main__':

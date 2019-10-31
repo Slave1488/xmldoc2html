@@ -4,7 +4,8 @@ import memberCompiler as mcompiler
 from layout import Page, view
 import mapCreator as mcreator
 import tableCompile as tcompile
-from tagDecorator import decorate_member, member_stylesheet
+from tagDecorator import decorate_member
+import styleCreator as screator
 
 
 def main():
@@ -17,7 +18,11 @@ def main():
             member_map, members, caption=f.name,
             decorate=decorate_member)
         page = Page()
-        page.add_content(member_stylesheet, table)
+        styles = []
+        with open('member_style.css') as ms, open('table_style.css') as ts:
+            styles.append(screator.create(ms))
+            styles.append(screator.create(ts))
+        page.add_content(*styles, table)
         html.write(page.view())
 
 

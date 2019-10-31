@@ -1,0 +1,18 @@
+table{
+    border-collapse: collapse;
+}
+caption{
+    text-decoration: underline;
+}
+th{
+    text-align: center;
+    border-width: 0 2px 1px;
+    border-style: solid;
+    border-color: black;
+}
+th:first-child{
+    border-left: 0;
+}
+th:last-child{
+    border-right: 0;
+}
