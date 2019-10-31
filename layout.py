@@ -31,13 +31,17 @@ class Tag:
         self._attrs = []
         self._content = []
 
-    def add_attr(self, attr):
-        self._attrs.append(attr)
+    def add_attrs(self, *attrs):
+        self._attrs.extend(attrs)
 
     def get_attrs(self, name=None):
         if name:
             return filter(lambda attr: attr._name == name, self._attrs)
         return self._attrs
+
+    def get_attr(self, name):
+        attrs = list(self.get_attrs(name))
+        return attrs[0] if attrs else None
 
     def add_content(self, *content):
         self._content.extend(content)
@@ -65,3 +69,30 @@ class Tag:
             attr=attrs_view,
             cont=move_text(content_view)
         )
+
+
+class Page:
+    def __init__(self):
+        self._content = []
+
+    def add_content(self, *content):
+        self._content.extend(content)
+
+    def get_content(self):
+        return filter(lambda cont: not isinstance(cont, Tag), self._content)
+
+    def get_tags(self, name=None):
+        if name:
+            return filter(lambda tag: tag._name == name, self.get_tags())
+        return filter(lambda cont: isinstance(cont, Tag), self._content)
+
+    def get_tag(self, name):
+        tags = self.get_tags(name)
+        return tags[0] if tags else None
+
+    def view(self):
+        return reduce(
+            add, map(lambda cont: f'{view(cont)}\n', self._content), '')
+
+    def __str__(self):
+        return self.view()
