@@ -1,19 +1,6 @@
 import re
-from enum import Enum
-from collections import namedtuple
+from memberID import MemberID, Character
 
-
-class MemberCharacter(Enum):
-    NAMESPACE = 'N'
-    TYPE = 'T'
-    METHOD = 'M'
-    FIELD = 'F'
-
-
-MemberID = namedtuple('memberID', [
-    'character',
-    'description'
-])
 
 caption_trash = re.compile(r'\s*[:=;{].*', re.DOTALL)
 method_signature = re.compile(r'\(.*\)$')
@@ -28,14 +15,14 @@ def parse(header):
         return
     description = header_tokens[-1]
     if header_tokens[-2] == 'namespace':
-        character = MemberCharacter.NAMESPACE
+        character = Character.NAMESPACE
     elif header_tokens[-2] == 'class':
-        character = MemberCharacter.TYPE
+        character = Character.TYPE
     elif signature:
         signature = signature.group()
-        character = MemberCharacter.METHOD
+        character = Character.METHOD
         if not empty_signature.fullmatch(signature):
             description += signature
     else:
-        character = MemberCharacter.FIELD
+        character = Character.FIELD
     return MemberID(character, description)

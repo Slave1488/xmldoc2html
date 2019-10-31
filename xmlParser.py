@@ -1,18 +1,5 @@
 import re
-from enum import Enum
-from collections import namedtuple
-
-XmlToken = namedtuple('xmlToken', [
-    'sum',
-    'val'
-])
-
-
-class XmlSummary(Enum):
-    OPEN_TAG, CLOSE_TAG, CONTENT = range(3)
-
-
-xml_token = re.compile(r'</(.*?)>|<(.*?)>|([^<\s][^<\n]*[^<\s]|[^<\s])')
+from xmlToken import XmlToken, re_xml_token, XmlSummary
 
 
 def get_token(simple_token):
@@ -27,4 +14,4 @@ def get_token(simple_token):
 
 
 def parse(line):
-    return (get_token(stoken) for stoken in xml_token.findall(line))
+    return (get_token(stoken) for stoken in re_xml_token.findall(line))
