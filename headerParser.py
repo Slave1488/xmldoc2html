@@ -1,16 +1,15 @@
 import re
 from memberID import MemberID, Character
 
-
-caption_trash = re.compile(r'\s*[:=;{].*', re.DOTALL)
-method_signature = re.compile(r'\(.*\)$')
-empty_signature = re.compile(r'\(\s*\)')
+re_caption_trash = re.compile(r'\s*[:=;{].*', re.DOTALL)
+re_method_signature = re.compile(r'\(.*\)$')
+re_empty_signature = re.compile(r'\(\s*\)')
 
 
 def parse(header):
-    header = caption_trash.sub('', header)
-    signature = method_signature.search(header)
-    header_tokens = method_signature.sub('', header).split()
+    header = re_caption_trash.sub('', header)
+    signature = re_method_signature.search(header)
+    header_tokens = re_method_signature.sub('', header).split()
     if len(header_tokens) < 2:
         return
     description = header_tokens[-1]
@@ -21,7 +20,7 @@ def parse(header):
     elif signature:
         signature = signature.group()
         character = Character.METHOD
-        if not empty_signature.fullmatch(signature):
+        if not re_empty_signature.fullmatch(signature):
             description += signature
     else:
         character = Character.FIELD

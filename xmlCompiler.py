@@ -1,6 +1,6 @@
 import re
 from layout import Tag, Attribute
-from xmlParser import XmlToken, XmlSummary
+from xmlToken import XmlSummary
 
 attribute = re.compile(r'(\S+)="(.*)"')
 
