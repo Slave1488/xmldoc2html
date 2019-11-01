@@ -3,9 +3,9 @@ from layout import Tag
 
 def compile_th_tr(name_list):
     tr = Tag('tr')
-    for cont in name_list:
+    for name in name_list:
         th = Tag('th')
-        th.add_content(*cont)
+        th.add_content(name)
         tr.add_content(th)
     return tr
 
