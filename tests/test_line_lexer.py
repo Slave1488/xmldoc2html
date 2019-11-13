@@ -1,35 +1,32 @@
 import unittest
-import headerParser
-import memberID
-import xmlLexer
-import xmlToken
-import lineLexer
-import lineToken
+from cscode import lineparser, linelexer, linetoken
+from myxml.member import id
+from myxml import lexer as xlexer, token as xtoken
 
 
 class TestHeaderParser(unittest.TestCase):
     def test(self):
-        parsed_namespace = headerParser.parse('namespace N')
+        parsed_namespace = lineparser.parse('namespace N')
         self.assertEqual(parsed_namespace,
-                         memberID.MemberID(memberID.Character.NAMESPACE, 'N'))
-        parsed_class = headerParser.parse('class T')
+                         id.MemberID(id.Character.NAMESPACE, 'N'))
+        parsed_class = lineparser.parse('class T')
         self.assertEqual(parsed_class,
-                         memberID.MemberID(memberID.Character.TYPE, 'T'))
-        parsed_func = headerParser.parse('int foo(int x, int y) { bar(); }')
+                         id.MemberID(id.Character.TYPE, 'T'))
+        parsed_func = lineparser.parse('int foo(int x, int y) { bar(); }')
         self.assertEqual(parsed_func,
-                         memberID.MemberID(memberID.Character.METHOD,
+                         id.MemberID(id.Character.METHOD,
                                            'foo(int x, int y)'))
-        parsed_fild = headerParser.parse('int PI = 314;')
+        parsed_fild = lineparser.parse('int PI = 314;')
         self.assertEqual(parsed_fild,
-                         memberID.MemberID(memberID.Character.FIELD, 'PI'))
+                         id.MemberID(id.Character.FIELD, 'PI'))
 
 
 class TestXmlLexer(unittest.TestCase):
     def test(self):
-        tokens = list(xmlLexer.get_tokens('text <tag>text</tag> text'))
+        tokens = list(xlexer.get_tokens('text <tag>text</tag> text'))
         self.assertEqual(len(tokens), 5)
-        self.assertEqual(tokens[1].sum, xmlToken.XmlSummary.OPEN_TAG)
-        self.assertEqual(tokens[3].sum, xmlToken.XmlSummary.CLOSE_TAG)
+        self.assertEqual(tokens[1].sum, xtoken.XmlSummary.OPEN_TAG)
+        self.assertEqual(tokens[3].sum, xtoken.XmlSummary.CLOSE_TAG)
 
 
 lines = [
@@ -41,10 +38,10 @@ lines = [
 
 class TestLineLexer(unittest.TestCase):
     def test(self):
-        tokens = list(lineLexer.get_tokens(lines))
-        self.assertEqual(tokens[0].sum, lineToken.LineSummary.DOC)
-        self.assertEqual(tokens[1].sum, lineToken.LineSummary.HEADER)
-        self.assertEqual(tokens[2].sum, lineToken.LineSummary.TRASH)
+        tokens = list(linelexer.get_tokens(lines))
+        self.assertEqual(tokens[0].sum, linetoken.LineSummary.DOC)
+        self.assertEqual(tokens[1].sum, linetoken.LineSummary.HEADER)
+        self.assertEqual(tokens[2].sum, linetoken.LineSummary.TRASH)
 
 
 if __name__ == '__main__':

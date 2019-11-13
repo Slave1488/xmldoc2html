@@ -1,5 +1,5 @@
 import unittest
-import layout
+import layout.description as layout
 
 attrs = [layout.Attribute('attr', 'val1'), layout.Attribute('attr', 'val2')]
 

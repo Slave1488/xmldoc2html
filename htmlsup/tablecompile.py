@@ -1,4 +1,4 @@
-from layout import Tag
+from layout.description import Tag
 
 
 def compile_th_tr(name_list):

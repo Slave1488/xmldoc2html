@@ -1,4 +1,4 @@
-from layout import Attribute
+from layout.description import Attribute
 
 
 def create_class(class_name):

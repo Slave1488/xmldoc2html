@@ -1,10 +1,10 @@
 import unittest
-import attributeCreator
+from layout import attributecreator
 
 
 class TestAttributeCreator(unittest.TestCase):
     def test(self):
-        attr = attributeCreator.create_class('class_value')
+        attr = attributecreator.create_class('class_value')
         self.assertEqual((attr._name, attr._value), ('class', 'class_value'))
 
 

@@ -12,12 +12,6 @@ parser.add_argument(
 if __name__ == "__main__":
     args = parser.parse_args()
     with open(args.source) as source:
-        if args.output:
-            try:
-                output = open(args.output, 'w')
-            except Exception:
-                output.close()
-        else:
-            output = sys.stdout
-        compile(source, output)
+        with open(args.output, 'w') if args.output else sys.stdout as output:
+            compile(source, output)
         output.close()

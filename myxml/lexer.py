@@ -1,5 +1,5 @@
 import re
-from xmlToken import re_xml_token, get_token
+from myxml.token import re_xml_token, get_token
 
 
 def get_tokens(line):

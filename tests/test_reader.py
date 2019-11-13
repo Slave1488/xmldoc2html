@@ -1,5 +1,5 @@
 import unittest
-import reader
+from filesup import reader
 
 
 class ReaderTest(unittest.TestCase):

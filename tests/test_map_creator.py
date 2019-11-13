@@ -1,7 +1,6 @@
 import unittest
-import mapCreator
-import layout
-import tagMap
+import layout.map.creator as mapCreator
+import layout.description as layout
 
 
 tested_tag = layout.Tag('tag')

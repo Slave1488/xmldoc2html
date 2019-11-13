@@ -1,6 +1,6 @@
 from functools import reduce
 import layout
-from tagMap import Map
+from layout.map.description import Map
 
 
 def create(tag, *tags):

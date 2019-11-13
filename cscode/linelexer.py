@@ -1,5 +1,5 @@
 import re
-from lineToken import create_token
+from cscode.linetoken import create_token
 
 
 def get_tokens(lines):

@@ -1,6 +1,6 @@
-from lineToken import LineSummary
-import xmlCompiler as xcomiler
-from layout import Attribute
+from cscode.linetoken import LineSummary
+import myxml.compiler as xcomiler
+from layout.description import Attribute
 
 
 def compile(line_tokens):

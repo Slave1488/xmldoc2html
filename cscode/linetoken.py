@@ -1,8 +1,8 @@
 from collections import namedtuple
 from enum import Enum
 import re
-import xmlLexer as xlexer
-import headerParser as hparser
+import myxml.lexer as xlexer
+import cscode.lineparser as hparser
 
 LineToken = namedtuple('lineToken', [
     'sum',

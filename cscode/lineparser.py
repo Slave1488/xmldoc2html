@@ -1,5 +1,5 @@
 import re
-from memberID import MemberID, Character
+from myxml.member.id import MemberID, Character
 
 re_caption_trash = re.compile(r'\s*[:=;{].*', re.DOTALL)
 re_method_signature = re.compile(r'\(.*\)$')
