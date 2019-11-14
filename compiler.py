@@ -13,7 +13,7 @@ def save_gen(generator):
     return list(generator)
 
 
-def compile(source, output):
+def compile(source):
     page = Page()
     lines = reader.get_line_reader(source)
     lts = llexer.get_tokens(lines)
@@ -31,4 +31,4 @@ def compile(source, output):
     with open(styles_dir / 'table_style.css') as ts:
         styles.append(screator.create(ts))
     page.add_content(*styles, table)
-    output.write(page.view())
+    return page.view()
