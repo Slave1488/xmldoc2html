@@ -1,8 +1,17 @@
 import unittest
-from layout.description import Tag
-from myxml import compiler as xcompiler, token
-from myxml.member import compiler as mcompiler, id
-from cscode import linetoken
+import sys
+import os
+try:
+    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 os.path.pardir))
+    from layout.description import Tag
+    from myxml import compiler as xcompiler, token
+    from myxml.member import compiler as mcompiler, id
+    from cscode import linetoken
+except Exception:
+    print('Module is missing!')
+    exit(1)
+
 
 tokens = [
     token.XmlToken(token.XmlSummary.CONTENT, 'text'),

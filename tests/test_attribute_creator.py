@@ -1,5 +1,13 @@
 import unittest
-from layout import attributecreator
+import sys
+import os
+try:
+    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 os.path.pardir))
+    from layout import attributecreator
+except Exception:
+    print('Module is missing!')
+    exit(1)
 
 
 class TestAttributeCreator(unittest.TestCase):

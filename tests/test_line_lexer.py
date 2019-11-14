@@ -1,7 +1,15 @@
 import unittest
-from cscode import lineparser, linelexer, linetoken
-from myxml.member import id
-from myxml import lexer as xlexer, token as xtoken
+import sys
+import os
+try:
+    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                 os.path.pardir))
+    from cscode import lineparser, linelexer, linetoken
+    from myxml.member import id
+    from myxml import lexer as xlexer, token as xtoken
+except Exception:
+    print('Module is missing!')
+    exit(1)
 
 
 class TestHeaderParser(unittest.TestCase):
@@ -15,7 +23,7 @@ class TestHeaderParser(unittest.TestCase):
         parsed_func = lineparser.parse('int foo(int x, int y) { bar(); }')
         self.assertEqual(parsed_func,
                          id.MemberID(id.Character.METHOD,
-                                           'foo(int x, int y)'))
+                                     'foo(int x, int y)'))
         parsed_fild = lineparser.parse('int PI = 314;')
         self.assertEqual(parsed_fild,
                          id.MemberID(id.Character.FIELD, 'PI'))
